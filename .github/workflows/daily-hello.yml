@@ -1,0 +1,15 @@
+# .github/workflows/daily-hello.yml
+name: Daily Hello
+
+on:
+  schedule:
+    # 每天 UTC 0 点执行（北京时间约早上 8 点）
+    - cron: '0 0 * * *'
+  workflow_dispatch:   # 允许手动触发（方便测试）
+
+jobs:
+  say-hello:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print hello
+        run: echo "hello"
