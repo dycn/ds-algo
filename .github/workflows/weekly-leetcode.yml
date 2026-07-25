@@ -1,0 +1,41 @@
+# .github/workflows/weekly-leetcode.yml
+name: Weekly LeetCode
+
+on:
+  schedule:
+    # 每周一北京时间 0 点执行（UTC 周日 16:00）
+    - cron: '0 16 * * 0'
+  workflow_dispatch:   # 允许手动触发（方便测试）
+
+permissions:
+  contents: write      # 允许推送提交到仓库
+
+jobs:
+  sync-daily-questions:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Fetch LeetCode daily questions
+        run: python3 scripts/fetch_leetcode.py
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add weekly/
+          if git diff --staged --quiet; then
+            echo "没有新增题目，跳过提交"
+          else
+            git commit -m "chore(leetcode): sync weekly daily questions"
+            git push
+          fi
